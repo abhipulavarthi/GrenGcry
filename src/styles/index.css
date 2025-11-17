@@ -1,0 +1,227 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body, #root { height: 100%; background-color: #FAFAFA; }
+
+/* Animated grocery background: floating blobs */
+@keyframes blobMoveA {
+  0% { transform: translate(-10%, -10%) scale(1); }
+  50% { transform: translate(10%, 5%) scale(1.1); }
+  100% { transform: translate(-10%, -10%) scale(1); }
+}
+@keyframes blobMoveB {
+  0% { transform: translate(10%, 20%) scale(1); }
+  50% { transform: translate(-5%, -10%) scale(1.2); }
+  100% { transform: translate(10%, 20%) scale(1); }
+}
+@keyframes subtleDrift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.grocery-animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #FAFAFA;
+  background-size: 200% 200%;
+  animation: subtleDrift 30s ease-in-out infinite;
+}
+
+.grocery-animated-bg::before,
+.grocery-animated-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.25;
+  mix-blend-mode: screen;
+}
+
+/* Left/top mint blob (greens) */
+.grocery-animated-bg::before {
+  width: 40vmax;
+  height: 40vmax;
+  left: -10vmax;
+  top: -8vmax;
+  background: none;
+  opacity: 0;
+  animation: blobMoveA 26s ease-in-out infinite;
+}
+
+/* Right/bottom amber-blue blob (grains & water) */
+.grocery-animated-bg::after {
+  width: 46vmax;
+  height: 46vmax;
+  right: -12vmax;
+  bottom: -10vmax;
+  background: none;
+  opacity: 0;
+  animation: blobMoveB 32s ease-in-out infinite;
+}
+
+/* Blob Button Styles */
+.blob-btn {
+  --num-of-blobs: 4;
+  --blob-border: #ac0b0b;
+  --blob-text: #EF4444;
+  --blob-inner: #ffffff;
+  z-index: 1;
+  position: relative;
+  padding: 8px 16px;
+  margin-bottom: 0;
+  text-align: center;
+  text-transform: capitalize;
+  color: var(--blob-text);
+  font-size: 14px;
+  font-weight: 600;
+  background-color: transparent;
+  outline: none;
+  border: 1px solid #252525;
+  transition: color 0.5s;
+  cursor: pointer;
+  border-radius: 9999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.blob-btn:before {
+  content: "";
+  z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 9999px;
+}
+
+.blob-btn:after {
+  content: "";
+  z-index: -2;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s 0.2s;
+  border-radius: 9999px;
+}
+
+.blob-btn:hover {
+  color: #FFFFFF;
+}
+
+.blob-btn:hover:after {
+  transition: all 0.3s;
+  left: 0;
+  top: 0;
+  background: var(--blob-border);
+}
+
+.blob-btn__inner {
+  z-index: -1;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--blob-inner);
+}
+
+.blob-btn__blobs {
+  position: relative;
+  display: block;
+  height: 100%;
+  filter: url('#goo');
+}
+
+.blob-btn__blob {
+  position: absolute;
+  top: 2px;
+  width: calc(100% / 4);
+  height: 100%;
+  background: var(--blob-border);
+  border-radius: 100%;
+  transform: translate3d(0, 150%, 0) scale(1.7);
+  transition: transform 0.45s;
+}
+
+@supports (filter: url('#goo')) {
+  .blob-btn__blob {
+    transform: translate3d(0, 150%, 0) scale(1.4);
+  }
+}
+
+/* Blob button color variants */
+.blob-btn--coffee {
+  --blob-border: #4A0404;
+  --blob-text: #4A0404;
+}
+
+.blob-btn--products {
+  --blob-border: #DB2D43;
+  --blob-text: #DB2D43;
+}
+
+.blob-btn--orders {
+  --blob-border: #4B6B9A;
+  --blob-text: #4B6B9A;
+}
+
+/* Offers variant */
+.blob-btn--offers {
+  --blob-border: #0014A8;
+  --blob-text: #0014A8;
+}
+
+.blob-btn__blob:nth-child(1) {
+  left: 0%;
+  transition-delay: 0s;
+}
+
+.blob-btn__blob:nth-child(2) {
+  left: 30%;
+  transition-delay: 0.08s;
+}
+
+.blob-btn__blob:nth-child(3) {
+  left: 60%;
+  transition-delay: 0.16s;
+}
+
+.blob-btn__blob:nth-child(4) {
+  left: 90%;
+  transition-delay: 0.24s;
+}
+
+.blob-btn:hover .blob-btn__blob {
+  transform: translateZ(0) scale(1.7);
+}
+
+@supports (filter: url('#goo')) {
+  .blob-btn:hover .blob-btn__blob {
+    transform: translateZ(0) scale(1.4);
+  }
+}
+
+/* Print only the invoice area */
+@media print {
+  body * { visibility: hidden !important; }
+  #print-area, #print-area * { visibility: visible !important; }
+  #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+}
