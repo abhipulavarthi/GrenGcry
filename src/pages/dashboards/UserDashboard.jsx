@@ -30,72 +30,66 @@ const CategoryTile = ({ title, img }) => (
   </Link>
 );
 
-// Carousel section
-function Carousel() {
-  const BASE = import.meta?.env?.BASE_URL || '/';
-  const IMGS = [1, 2, 3, 4, 5, 6].map((n) => `${BASE}images/${n}.png`);
-
-  const [idx, setIdx] = useState(0);
-  const wrapRef = useRef(null);
-  const [w, setW] = useState(935); // default width
-  const ratio = 331 / 935;
-
-  // Auto-slide
-  useEffect(() => {
-    const id = setInterval(() => {
-      setIdx((v) => (v + 1) % IMGS.length);
-    }, 3000); // slower for better UX
-    return () => clearInterval(id);
-  }, [IMGS.length]);
-
-  // Resize handler (with debounce)
-  useEffect(() => {
-    let timeout;
-    const recalc = () => {
-      if (wrapRef.current) {
-        const cw = wrapRef.current.clientWidth;
-        if (cw && Math.abs(cw - w) > 1) setW(cw);
-      }
-    };
-    const handleResize = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(recalc, 150);
-    };
-    recalc();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [w]);
-
-  return (
-    <div
-      ref={wrapRef}
-      className="relative overflow-hidden rounded-lg border bg-white w-full"
-      style={{ height: w ? Math.round(w * ratio) : 300 }}
-    >
-      <div
-        className="flex h-full transition-transform duration-[1500ms] ease-in-out"
-        style={{
-          width: w * IMGS.length,
-          transform: `translateX(-${idx * w}px)`,
-        }}
-      >
-        {IMGS.map((src, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center"
-            style={{ width: w, height: Math.round(w * ratio) }}
-          >
-            <img
-              src={src}
-              alt={`Slide ${i + 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-        ))}
+// Footer Links Section
+const LinksSection = () => (
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-10 text-gray-500 text-sm border-t border-gray-100 mt-12">
+    {/* Useful Links */}
+    <div className="md:col-span-1">
+      <h3 className="font-bold text-gray-800 mb-4 text-base">Useful Links</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
+        <div className="flex flex-col gap-3">
+          <Link to="#" className="hover:text-gray-800 transition-colors">Blog</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Privacy</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Terms</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">FAQs</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Security</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Contact</Link>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link to="#" className="hover:text-gray-800 transition-colors">Partner</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Franchise</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Seller</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Warehouse</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Deliver</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Resources</Link>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link to="#" className="hover:text-gray-800 transition-colors">Recipes</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Bistro</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">District</Link>
+        </div>
       </div>
     </div>
-  );
-}
+
+    {/* Categories */}
+    <div className="md:col-span-3">
+      <div className="flex items-center gap-2 mb-4">
+        <h3 className="font-bold text-gray-800 text-base">Categories</h3>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2">
+        <div className="flex flex-col gap-3">
+          <Link to="/category/vegetables" className="hover:text-gray-800 transition-colors">Vegetables & Fruits</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Cold Drinks & Juices</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Bakery & Biscuits</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Dry Fruits, Masala & Oil</Link>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link to="#" className="hover:text-gray-800 transition-colors">Dairy & Breakfast</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Instant & Frozen Food</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Sweet Tooth</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Sauces & Spreads</Link>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link to="#" className="hover:text-gray-800 transition-colors">Munchies</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Tea, Coffee & Milk Drinks</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Atta, Rice & Dal</Link>
+          <Link to="#" className="hover:text-gray-800 transition-colors">Chicken, Meat & Fish</Link>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // Main homepage component
 export default function HomePage() {
@@ -118,224 +112,50 @@ export default function HomePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-2">
       {/* Buttons row below navbar */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div ref={menuWrapRef} className="relative">
-              <button
-                onClick={() => setMenuOpen((v) => !v)}
-                className="blob-btn blob-btn--coffee"
-              >
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                  </span>
-                </span>
-                Shop by Category
-              </button>
-              {menuOpen && (
-                <CategoryMegaMenu
-                  open={menuOpen}
-                  onClose={() => setMenuOpen(false)}
-                />
-              )}
-            </div>
-            {role === 'admin' && (
-              <Link
-                to="/orders"
-                className="blob-btn blob-btn--orders"
-                title="View all user orders"
-              >
-                <span className="blob-btn__inner">
-                  <span className="blob-btn__blobs">
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                    <span className="blob-btn__blob"></span>
-                  </span>
-                </span>
-                All Orders
-              </Link>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <OffersButton className="blob-btn--offers" />
-            <Link to="/products" className="blob-btn blob-btn--products">
-              <span className="blob-btn__inner">
-                <span className="blob-btn__blobs">
-                  <span className="blob-btn__blob"></span>
-                  <span className="blob-btn__blob"></span>
-                  <span className="blob-btn__blob"></span>
-                  <span className="blob-btn__blob"></span>
-                </span>
-              </span>
-              All Products
-            </Link>
-          </div>
-        </div>
-      </div>
 
-      {/* Offers section */}
-      <section>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            to="/category/cleaning-household"
-            className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-          >
-            <img
-              className="w-full h-full aspect-[16/9] object-cover"
-              src="/images/hos.jpg"
-              alt="Cleaning & Household"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-3">
-              <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                Cleaning & Household
-              </span>
-            </div>
-          </Link>
-          <Link
-            to="/category/icecreams"
-            className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-          >
-            <img
-              className="w-full h-full aspect-[16/9] object-cover"
-              src="/images/ice.jpg"
-              alt="Ice Creams"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-3">
-              <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                Ice Creams
-              </span>
-            </div>
-          </Link>
-          <Link
-            to="/category/chocolates"
-            className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-          >
-            <img
-              className="w-full h-full aspect-[16/9] object-cover"
-              src="/images/choc.jpg"
-              alt="Chocolates"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-3">
-              <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                Chocolates
-              </span>
-            </div>
-          </Link>
-          <Link
-            to="/category/beverages"
-            className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-          >
-            <img
-              className="w-full h-full aspect-[16/9] object-cover"
-              src="/images/tin.jpg"
-              alt="Beverages"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-3">
-              <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                Beverages
-              </span>
-            </div>
-          </Link>
-        </div>
-      </section>
 
-      {/* Category tiles section */}
+      {/* Grocery & Kitchen Grid */}
       <section className="mt-8">
-        <div className="grid md:grid-cols-2 gap-4">
-          <Link
-            to="/category/seasonal"
-            className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-          >
-            <img
-              className="w-full h-full aspect-[16/9] object-cover"
-              src="/images/seasonal.jpg"
-              alt="Seasonal Fruits & Vegetables"
-            />
-            <div className="absolute inset-x-0 bottom-0 p-4">
-              <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                Fruits & Vegetables
+        <h2 className="text-xl font-bold text-gray-800 mb-6">Grocery & Kitchen</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {[
+            { title: 'Fresh Vegetables', img: '/images/fresh-vegetables.jpg', link: '/category/vegetables' },
+            { title: 'Fresh Fruits', img: '/images/fruits.jpg', link: '/category/fruits' },
+            { title: 'Dairy, Bread and Eggs', img: '/images/dairy_bread_eggs.png', link: '/category/dairy-bread-eggs' },
+            { title: 'Cereals and Breakfast', img: '/images/cereals_breakfast.png', link: '/category/cereals-breakfast' },
+            { title: 'Atta, Rice and Dal', img: '/images/atta_rice_dal.png', link: '/category/atta-rice-dal' },
+            { title: 'Oils and Ghee', img: '/images/oils_ghee.png', link: '/category/oils-ghee' },
+            { title: 'Masalas', img: '/images/herbs-seasonings.jpg', link: '/category/masalas' },
+            { title: 'Dry Fruits and Seeds Mix', img: '/images/dry_fruits.png', link: '/category/dry-fruits-seeds' },
+            { title: 'Biscuits and Cakes', img: '/images/biscuits_cakes.png', link: '/category/biscuits-cakes' },
+            { title: 'Tea, Coffee and Milk drinks', img: '/images/tea_coffee.png', link: '/category/tea-coffee' },
+            { title: 'Sauces and Spreads', img: '/images/sauces_spreads.png', link: '/category/sauces-spreads' },
+            { title: 'Meat and Seafood', img: '/images/meat_seafood.png', link: '/category/meat-seafood' },
+          ].map((item, idx) => (
+            <Link
+              key={idx}
+              to={item.link}
+              className="group flex flex-col items-center gap-3"
+            >
+              <div className="w-full aspect-square bg-white rounded-3xl flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-300 group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] group-hover:border-[#FF0038]/20 group-hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className="w-full h-full object-cover relative z-10"
+                />
+              </div>
+              <span className="text-center text-sm font-bold text-gray-700 leading-tight group-hover:text-[#FF0038] transition-colors">
+                {item.title}
               </span>
-            </div>
-          </Link>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Link
-              to="/category/vegetables"
-              className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-            >
-              <img
-                className="w-full h-full aspect-[16/9] object-cover"
-                src="/images/fresh-vegetables.jpg"
-                alt="Vegetables"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-3">
-                <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                  Vegetables
-                </span>
-              </div>
             </Link>
-
-            <Link
-              to="/category/fruits"
-              className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-            >
-              <img
-                className="w-full h-full aspect-[16/9] object-cover"
-                src="/images/fruits.jpg"
-                alt="Fruits"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-3">
-                <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                  Fruits
-                </span>
-              </div>
-            </Link>
-
-            <Link
-              to="/category/herbs-seasonings"
-              className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-            >
-              <img
-                className="w-full h-full aspect-[16/9] object-cover"
-                src="/images/herbs-seasonings.jpg"
-                alt="Herbs & Seasonings"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-3">
-                <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                  Herbs & Seasonings
-                </span>
-              </div>
-            </Link>
-
-            <Link
-              to="/category/snacks-branded-foods"
-              className="rounded-xl overflow-hidden border bg-white relative group hover:shadow-md transition"
-            >
-              <img
-                className="w-full h-full aspect-[16/9] object-cover"
-                src="/images/snacks.jpg"
-                alt="Snacks & Branded Foods"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-3">
-                <span className="inline-block px-3 py-1 rounded-md bg-[#FAFAFA]/60 text-gray-900 font-medium group-hover:bg-[#FAFAFA]">
-                  Snacks & Branded Foods
-                </span>
-              </div>
-            </Link>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Featured section (hidden for admin) */}
       {role !== 'admin' && (
-        <section className="mt-8">
-          <Carousel />
-        </section>
+        <LinksSection />
       )}
     </div>
   );

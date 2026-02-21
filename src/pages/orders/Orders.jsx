@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 export default function Orders() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
-  const { role } = useSelector(s => s.auth)
+  const { user, role } = useSelector(s => s.auth)
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -15,12 +15,9 @@ export default function Orders() {
       if (role === 'admin') {
         const res = await api.getOrders()
         setOrders(res.data?.items || res.data || [])
-      } else {
-        // No user-list endpoint available; show recent orders created by this user from localStorage fallback
-        try {
-          const mine = JSON.parse(localStorage.getItem('myOrders') || '[]')
-          setOrders(Array.isArray(mine) ? mine : [])
-        } catch { setOrders([]) }
+      } else if (user) {
+        const res = await api.getOrders({ userId: user._id || user.id })
+        setOrders(res.data?.orders || res.data || [])
       }
     } catch { toast.error('Failed to load orders') }
     finally { setLoading(false) }
@@ -61,12 +58,35 @@ export default function Orders() {
                   <td className="p-2">{o.id}</td>
                   {role === 'admin' && <td className="p-2">{o.customer?.name || o.user?.name || '-'}</td>}
                   <td className="p-2">₹{Number(o.total ?? 0).toFixed(2)}</td>
-                  <td className="p-2">{o.status}</td>
+                  <td className="p-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${String(o.status).toUpperCase() === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                        ['PLACED', 'PROCESSING'].includes(String(o.status).toUpperCase()) ? 'bg-blue-100 text-blue-700' :
+                          'bg-yellow-100 text-yellow-700'
+                      }`}>
+                      {o.status}
+                    </span>
+                  </td>
                   <td className="p-2 flex gap-2">
                     {role === 'admin' && String(o.status).toUpperCase() === 'PENDING' && (
-                      <button onClick={() => acceptOrder(o.id)} className="px-2 py-1 text-xs border rounded-full hover:bg-[#FF0038] hover:text-white">Accept</button>
+                      <button onClick={() => acceptOrder(o.id)} className="px-2 py-1 text-xs border rounded-full hover:bg-green-500 hover:text-white transition-colors">Accept</button>
                     )}
-                    <Link to={`/billing/${o.id}?view=invoice`} className="px-2 py-1 text-xs bg-[#FF0038] text-white rounded-full">Invoice</Link>
+                    {role === 'admin' && ['PLACED', 'PROCESSING'].includes(String(o.status).toUpperCase()) && (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await api.updateOrder(o.id, { status: 'DELIVERED' })
+                            toast.success('Order marked as delivered')
+                            fetchOrders()
+                          } catch {
+                            toast.error('Failed to update order status')
+                          }
+                        }}
+                        className="px-2 py-1 text-xs border border-green-200 text-green-600 rounded-full hover:bg-green-50 transition-colors"
+                      >
+                        Mark Delivered
+                      </button>
+                    )}
+                    <Link to={`/billing/${o.id}?view=invoice`} className="px-2 py-1 text-xs bg-[#FF0038] text-white rounded-full hover:bg-opacity-90 transition-all">Invoice</Link>
                   </td>
                 </tr>
               ))}

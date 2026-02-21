@@ -27,78 +27,79 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ProductRepository productRepository;
+        @Autowired
+        private OrderRepository orderRepository;
+        @Autowired
+        private UserRepository userRepository;
+        @Autowired
+        private ProductRepository productRepository;
 
-    public PagedResponse<OrderResponse> getOrders(OrderStatus status, Integer page, Integer limit) {
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<Order> orderPage = (status != null) ?
-            orderRepository.findByStatus(status, pageable) :
-            orderRepository.findAll(pageable);
-        
-        List<OrderResponse> orders = orderPage.getContent().stream()
-            .map(EntityMapper::toOrderResponse)
-            .collect(Collectors.toList());
-            
-        return new PagedResponse<>(orders, orderPage.getTotalElements(), page, orderPage.getTotalPages());
-    }
+        public PagedResponse<OrderResponse> getOrders(OrderStatus status, Integer page, Integer limit) {
+                Pageable pageable = PageRequest.of(page - 1, limit);
+                Page<Order> orderPage = (status != null) ? orderRepository.findByStatus(status, pageable)
+                                : orderRepository.findAll(pageable);
 
-    public OrderResponse getOrderById(Long id) {
-        Order order = orderRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Order not found", "id", id));
-        return EntityMapper.toOrderResponse(order);
-    }
+                List<OrderResponse> orders = orderPage.getContent().stream()
+                                .map(EntityMapper::toOrderResponse)
+                                .collect(Collectors.toList());
 
-    @Transactional
-    public OrderResponse createOrder(Long userId, CreateOrderRequest request) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found", "id", userId));
-
-        Order order = new Order();
-        order.setUser(user);
-        
-        List<OrderItem> orderItems = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (CreateOrderRequest.OrderProductRequest productRequest : request.getProducts()) {
-            Product product = productRepository.findById(productRequest.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", productRequest.getProductId()));
-            
-            if (product.getStock() < productRequest.getQuantity()) {
-                throw new BadRequestException("Not enough stock for product: " + product.getName());
-            }
-
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(productRequest.getQuantity());
-            orderItem.setPrice(product.getPrice());
-            orderItems.add(orderItem);
-
-            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity())));
-            
-            product.setStock(product.getStock() - productRequest.getQuantity());
-            productRepository.save(product);
+                return new PagedResponse<>(orders, orderPage.getTotalElements(), page, orderPage.getTotalPages());
         }
 
-        order.setItems(orderItems);
-        order.setTotal(total);
-        order.setStatus(OrderStatus.PENDING);
-        
-        Order savedOrder = orderRepository.save(order);
-        return EntityMapper.toOrderResponse(savedOrder);
-    }
+        public OrderResponse getOrderById(Long id) {
+                Order order = orderRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "id", id));
+                return EntityMapper.toOrderResponse(order);
+        }
 
-    @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new ResourceNotFoundException("Order not found", "id", orderId));
-        order.setStatus(request.getStatus());
-        Order updatedOrder = orderRepository.save(order);
-        return EntityMapper.toOrderResponse(updatedOrder);
-    }
+        @Transactional
+        public OrderResponse createOrder(Long userId, CreateOrderRequest request) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException("User not found", "id", userId));
+
+                Order order = new Order();
+                order.setUser(user);
+
+                List<OrderItem> orderItems = new ArrayList<>();
+                BigDecimal total = BigDecimal.ZERO;
+
+                for (CreateOrderRequest.OrderProductRequest productRequest : request.getProducts()) {
+                        Product product = productRepository.findById(productRequest.getProductId())
+                                        .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id",
+                                                        productRequest.getProductId()));
+
+                        if (product.getStock() < productRequest.getQuantity()) {
+                                throw new BadRequestException("Not enough stock for product: " + product.getName());
+                        }
+
+                        OrderItem orderItem = new OrderItem();
+                        orderItem.setOrder(order);
+                        orderItem.setProduct(product);
+                        orderItem.setQuantity(productRequest.getQuantity());
+                        orderItem.setPrice(product.getPrice());
+                        orderItems.add(orderItem);
+
+                        total = total.add(
+                                        product.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity())));
+
+                        product.setStock(product.getStock() - productRequest.getQuantity());
+                        productRepository.save(product);
+                }
+
+                order.setItems(orderItems);
+                order.setTotal(total);
+                order.setStatus(OrderStatus.PENDING);
+
+                Order savedOrder = orderRepository.save(order);
+                return EntityMapper.toOrderResponse(savedOrder);
+        }
+
+        @Transactional
+        public OrderResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
+                Order order = orderRepository.findById(orderId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "id", orderId));
+                order.setStatus(request.getStatus());
+                Order updatedOrder = orderRepository.save(order);
+                return EntityMapper.toOrderResponse(updatedOrder);
+        }
 }

@@ -24,9 +24,11 @@ const OffersPage = lazy(() => import('./pages/offers/Offers'))
 const AccountPage = lazy(() => import('./pages/account/Account'))
 const CategoryProducts = lazy(() => import('./pages/category/CategoryProducts'))
 const AdminUsers = lazy(() => import('./pages/admin/Users'))
+const ProductView = lazy(() => import('./pages/products/ProductView.jsx'))
 
 const routes = [
-  { path: '/', element: <Layout />,
+  {
+    path: '/', element: <Layout />,
     children: [
       { index: true, element: <RoleHomeRedirect /> },
       { path: 'admin', element: <RoleRoute roles={['admin']}><AdminDashboard /></RoleRoute> },
@@ -45,6 +47,7 @@ const routes = [
       { path: 'reports', element: <RoleRoute roles={['admin']}><Reports /></RoleRoute> },
       { path: 'admin/users', element: <RoleRoute roles={['admin']}><AdminUsers /></RoleRoute> },
       { path: 'reviews', element: <RoleRoute roles={['admin']}><AdminReviews /></RoleRoute> },
+      { path: 'item/:id', element: <ProductView /> },
       { path: 'feedback', element: <Feedback /> },
     ]
   },

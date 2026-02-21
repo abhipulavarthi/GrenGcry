@@ -16,42 +16,42 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(ApiResponse.error(ex.getMessage(), ex.getCode()));
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getCode(), ex.getMessage()));
     }
-    
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequestException(BadRequestException ex) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error(ex.getMessage(), ex.getCode(), ex.getDetails()));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getCode(), ex.getMessage(), ex.getDetails()));
     }
-    
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse<Void>> handleUnauthorizedException(UnauthorizedException ex) {
         return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(ApiResponse.error(ex.getMessage(), ex.getCode()));
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getCode(), ex.getMessage()));
     }
-    
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
         return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(ApiResponse.error("Invalid credentials", "AUTH_001"));
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("AUTH_001", "Invalid credentials"));
     }
-    
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException ex) {
         return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error("Insufficient permissions", "AUTH_004"));
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("AUTH_004", "Insufficient permissions"));
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -60,24 +60,24 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        
+
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error("Validation failed", "VALIDATION_ERROR", errors));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("VALIDATION_ERROR", "Validation failed", errors));
     }
-    
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error("File size exceeds maximum allowed size (5MB)", "FILE_TOO_LARGE"));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("FILE_TOO_LARGE", "File size exceeds maximum allowed size (5MB)"));
     }
-    
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
         ex.printStackTrace();
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error("An unexpected error occurred", "INTERNAL_ERROR"));
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("INTERNAL_ERROR", "An unexpected error occurred"));
     }
 }

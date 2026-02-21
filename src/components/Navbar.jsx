@@ -35,9 +35,9 @@ export default function Navbar() {
     const exists = new Set([term.toLowerCase()])
     const next = [term, ...recent.filter(x => !exists.has(String(x).toLowerCase()))].slice(0, 8)
     setRecent(next)
-    try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)) } catch {}
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)) } catch { }
   }
-  const clearRecent = () => { setRecent([]); try { localStorage.removeItem(RECENT_KEY) } catch {} }
+  const clearRecent = () => { setRecent([]); try { localStorage.removeItem(RECENT_KEY) } catch { } }
 
   // fetch and shuffle suggestions when dropdown opens and query is empty; keep reshuffling on a timer
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function Navbar() {
         const unique = Array.from(new Set(products.map(p => p.name))).slice(0, 400)
         setAllNames(unique)
         shuffleFromAll(unique)
-      } catch {}
+      } catch { }
     }
     if (showSearch && !q) {
       if (!allNames.length) load(); else shuffleFromAll(allNames)
@@ -76,7 +76,7 @@ export default function Navbar() {
     }
     const query = q.toLowerCase().trim()
     const filtered = allProducts
-      .filter(p => p.name.toLowerCase().includes(query) || (p.category||'').toLowerCase().includes(query))
+      .filter(p => p.name.toLowerCase().includes(query) || (p.category || '').toLowerCase().includes(query))
       .slice(0, 8)
     setFilteredProducts(filtered)
   }, [q, allProducts])
@@ -108,150 +108,174 @@ export default function Navbar() {
   const isAdminRoute = location.pathname.startsWith('/admin')
 
   return (
-    <header className={`sticky top-0 z-20 ${isAdminRoute ? 'bg-[#0014A8]' : 'bg-[#FF0038]'} text-brand-teal border-b border-brand-steel/30 shadow-md`}>
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-        {location.pathname.startsWith('/admin/users') ? (
-          <Link to="/" className="font-semibold text-2xl text-[#252525] hover:text-[#FAFAFA] transition">FreshGrocery</Link>
-        ) : location.pathname.startsWith('/admin') ? (
-          <span className="font-semibold text-2xl text-[#FAFAFA] select-none cursor-default">FreshGrocery</span>
-        ) : (
-          <Link to="/" className="font-semibold text-2xl text-[#252525] hover:text-[#FAFAFA] transition">FreshGrocery</Link>
-        )}
+    <header className={`sticky top-0 z-50 ${isAdminRoute ? 'bg-[#0014A8] text-white' : 'bg-white text-gray-800'} border-b border-gray-100 shadow-[0_1px_15px_rgba(0,0,0,0.04)] h-[80px] flex items-center`}>
+      <div className="max-w-[1600px] w-full mx-auto px-4 lg:px-6 flex items-center justify-between gap-6">
 
-        {/* Search Bar */}
-        <form onSubmit={(e)=>{e.preventDefault(); doSearch()}} className="hidden md:block flex-1 relative" onFocus={()=>setShowSearch(true)}>
-          <input
-            value={q}
-            onChange={(e)=>setQ(e.target.value)}
-            placeholder="Search for Products..."
-            className="w-full px-4 py-2 pr-10 border border-brand-steel/30 rounded-full bg-white/40 focus:ring-2 focus:ring-brand-aqua outline-none placeholder:text-gray-600/70"
-            onBlur={()=>setTimeout(()=>setShowSearch(false), 120)}
-            onClick={()=>setShowSearch(true)}
-          />
-          <button type="button" onClick={doSearch} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 px-2 text-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"></path></svg>
-          </button>
+        {/* Left Section: Logo & Location */}
+        <div className="flex items-center gap-6">
+          <Link to="/" className="flex-shrink-0">
+            <div className="flex items-center group">
+              <div className="flex flex-col">
+                <span className={`text-2xl font-bold tracking-tight leading-none ${isAdminRoute ? 'text-white' : 'text-[#282C3F]'}`}>Fresh<span className="text-[#FF0038]">Grocery</span></span>
+                {isAdminRoute && <span className="text-[10px] font-mono text-blue-200">ADMIN</span>}
+              </div>
+            </div>
+          </Link>
+
+
+
+
+        </div>
+
+        {/* Middle Section: Search Bar */}
+        <form onSubmit={(e) => { e.preventDefault(); doSearch() }} className="hidden md:block flex-1 max-w-2xl relative z-30" onFocus={() => setShowSearch(true)}>
+          <div className="relative group">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search for &quot;Grapes&quot;..."
+              className={`w-full h-[50px] px-5 py-2 pr-12 text-sm font-medium border border-transparent rounded-[12px] placeholder:text-gray-400 focus:shadow-[0_4px_12px_rgba(0,0,0,0.05)] outline-none transition-all duration-200 ${isAdminRoute
+                ? 'bg-blue-900/40 text-white placeholder:text-blue-200 focus:bg-blue-900/60'
+                : 'bg-[#F4F6FB] text-gray-700 focus:bg-white focus:border-gray-200'
+                }`}
+              onBlur={() => setTimeout(() => setShowSearch(false), 200)}
+              onClick={() => setShowSearch(true)}
+            />
+            <button type="button" onClick={doSearch} className={`absolute right-0 top-0 h-full w-14 flex items-center justify-center transition-colors ${isAdminRoute ? 'text-blue-200 hover:text-white' : 'text-gray-400 hover:text-[#FF0038]'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </button>
+          </div>
+
+          {/* Dropdown Results */}
           {showSearch && (
-            <div className="absolute left-0 right-0 mt-2 bg-white border border-brand-steel/40 rounded-md shadow-lg p-4 z-30">
-              {/* Product Suggestions with Images */}
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden py-2" onMouseDown={(e) => e.preventDefault()}>
               {q && filteredProducts.length > 0 && (
-                <div className="mb-3">
-                  <div className="text-sm font-semibold mb-2">Products</div>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {filteredProducts.map((product) => (
-                      <button
-                        key={product.id}
-                        type="button"
-                        className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition text-left"
-                        onMouseDown={() => {
-                          saveRecent(product.name)
-                          navigate(`/products?q=${encodeURIComponent(product.name)}`)
-                          setShowSearch(false)
-                          setQ('')
-                        }}
-                      >
-                        <img
-                          src={product.image || 'https://via.placeholder.com/48x48'}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded border border-gray-200"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm text-gray-900 truncate">{product.name}</div>
-                          <div className="text-xs text-gray-500">{product.category}</div>
-                        </div>
-                        <div className="text-sm font-semibold text-[#FF0038]">
-                          {fmtINR(product.price)}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                <div className="px-2">
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-2">Products</div>
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      className="w-full flex items-center gap-4 p-3 hover:bg-[#F4F6FB] rounded-lg transition text-left group"
+                      onClick={() => {
+                        saveRecent(product.name)
+                        navigate(`/products?q=${encodeURIComponent(product.name)}`)
+                        setShowSearch(false)
+                        setQ('')
+                      }}
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-white border border-gray-100 p-1 flex items-center justify-center">
+                        <img src={product.image || 'https://via.placeholder.com/48x48'} alt={product.name} className="w-full h-full object-contain" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-gray-800 group-hover:text-[#FF0038] transition-colors">{product.name}</div>
+                        <div className="text-xs text-gray-400">{product.category}</div>
+                      </div>
+                      <div className="text-sm font-bold text-gray-700">
+                        {fmtINR(product.price)}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
 
-              {/* No Results */}
               {q && filteredProducts.length === 0 && (
-                <div className="text-center py-4 text-gray-500 text-sm">
-                  No products found for "{q}"
+                <div className="p-8 text-center">
+                  <div className="text-gray-300 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  </div>
+                  <p className="text-gray-500 text-sm">No products found for "{q}"</p>
                 </div>
               )}
 
-              {/* Recent Searches */}
-              {!q && recent.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold">Recent Searches</div>
-                    <button type="button" className="text-xs text-gray-500 hover:text-[#FF0038]" onMouseDown={clearRecent}>Clear</button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {recent.map((r, i)=> (
-                      <button key={i} type="button" className="px-3 py-1 rounded-full border text-sm" onMouseDown={()=>{saveRecent(r); setQ(r); navigate(`/products?q=${encodeURIComponent(r)}`); setShowSearch(false); setQ('')}}>{r}</button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Discover/Random Suggestions */}
-              {!q && suggestions.length > 0 && (
-                <div className="mt-3">
-                  <div className="text-sm font-semibold mb-2">Discover</div>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestions.map((s, i)=> (
-                      <button key={i} type="button" className="px-3 py-1 rounded-full border text-sm" onMouseDown={()=>{saveRecent(s); setQ(s); navigate(`/products?q=${encodeURIComponent(s)}`); setShowSearch(false); setQ('')}}>{s}</button>
-                    ))}
-                  </div>
+              {!q && (
+                <div className="p-4 space-y-4">
+                  {recent.length > 0 && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Recent Searches</div>
+                        <button type="button" className="text-xs text-[#FF0038] font-medium hover:underline" onClick={clearRecent}>Clear</button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {recent.map((r, i) => (
+                          <button key={i} type="button" className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 text-gray-600 rounded-full text-sm hover:bg-white hover:border-[#FF0038] hover:text-[#FF0038] transition" onClick={() => { saveRecent(r); setQ(r); navigate(`/products?q=${encodeURIComponent(r)}`); setShowSearch(false); setQ('') }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {suggestions.length > 0 && (
+                    <div>
+                      <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Trending Nearby</div>
+                      <div className="flex flex-wrap gap-2">
+                        {suggestions.map((s, i) => (
+                          <button key={i} type="button" className="flex items-center gap-2 px-3 py-1.5 bg-white border border-dashed border-gray-300 text-gray-600 rounded-full text-sm hover:border-[#FF0038] hover:text-[#FF0038] transition" onClick={() => { saveRecent(s); setQ(s); navigate(`/products?q=${encodeURIComponent(s)}`); setShowSearch(false); setQ('') }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
         </form>
 
-        <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-          {role !== 'admin' && (
-            <button 
-              onClick={() => setCartOpen(true)} 
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#FAFAFA] transition group"
-            >
-              <div className="relative">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-[#252525]">
-                  <path d="M7 18a2 2 0 100 4 2 2 0 000-4zm10 0a2 2 0 100 4 2 2 0 000-4zM3 3h2l3.6 7.59-1.35 2.45A2 2 0 009 16h9a1 1 0 100-2H9.42a.25.25 0 01-.22-.37L10 12h6a2 2 0 001.79-1.1l3.58-6.49A1 1 0 0020.5 3H6.21l-.94-2H1 a1 1 0 100 2h2z" />
-                </svg>
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 text-[10px] bg-[#FF0038] text-white rounded-full px-1 min-w-[16px] text-center leading-4 font-semibold">{cartCount}</span>
-                )}
-              </div>
-              <div className="hidden sm:flex flex-col items-start">
-                <span className="text-xs text-gray-600">Cart</span>
-                <span className="text-sm font-bold text-[#252525]">{fmtINR(cartTotal)}</span>
-              </div>
-            </button>
-          )}
+        {/* Right Section: Actions */}
+        <div className="flex items-center gap-4 lg:gap-8">
+          {/* Sign In / User Profile */}
           {user ? (
             <div className="relative" ref={menuRef}>
-              <button onClick={() => setOpen(v=>!v)} className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-sm font-semibold">{user.name?.[0]?.toUpperCase() || 'U'}</span>
+              <button onClick={() => setOpen(v => !v)} className={`flex items-center gap-2 transition group ${isAdminRoute ? 'text-white' : 'text-[#3D4152] hover:text-[#FF0038]'}`}>
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition border ${isAdminRoute ? 'bg-blue-800 border-blue-600 text-white' : 'bg-gray-100 border-gray-200 text-gray-700 group-hover:border-[#FF0038] group-hover:bg-[#FFF0F0] group-hover:text-[#FF0038]'}`}>
+                  {user.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <span className="font-medium hidden lg:block max-w-[100px] truncate">{user.name}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
               </button>
               {open && (
-                <div className="absolute right-0 mt-2 w-60 bg-[#FAFAFA] rounded-md shadow-lg border border-brand-steel/40 overflow-hidden">
-                  <Link to="/account" onClick={() => setOpen(false)} className="block px-4 py-2 text-sm font-semibold border-b border-brand-steel/20 hover:bg-[#FF0038]/10">My Account</Link>
-                  <Link to="/cart" className="flex items-center justify-between px-4 py-2 text-sm hover:bg-[#FF0038]/10">
-                    <span>My Basket</span>
-                    {cartCount > 0 && <span className="text-xs bg-brand-steel text-white rounded-full px-2">{cartCount} items</span>}
-                  </Link>
-                  <Link to="/orders" className="block px-4 py-2 text-sm hover:bg-[#FF0038]/10">My Orders</Link>
-                  <Link to="/feedback" className="block px-4 py-2 text-sm text-[#FF0038] hover:bg-[#FF0038]/10">Review</Link>
-                  <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm hover:bg-[#FF0038]/10">Logout</button>
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden py-1 z-50 text-gray-800">
+                  <Link to="/account" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-[#F3F9FF] hover:text-[#FF0038]">My Account</Link>
+                  <Link to="/orders" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-[#F3F9FF] hover:text-[#FF0038]">Orders</Link>
+                  <Link to="/feedback" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-[#F3F9FF] hover:text-[#FF0038]">Feedback</Link>
+                  <div className="h-px bg-gray-100 my-1"></div>
+                  <button onClick={onLogout} className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50">Logout</button>
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login" className="px-3 py-1 rounded-full border border-brand-steel text-[#252525] bg-white hover:bg-brand-sand/50">Login</Link>
-              <Link to="/signup" className="px-3 py-1 rounded-full border border-brand-steel text-[#252525] bg-white hover:bg-brand-sand/50">Sign Up</Link>
-            </div>
+            <Link to="/login" className={`flex items-center gap-2 transition font-medium ${isAdminRoute ? 'text-white hover:text-blue-200' : 'text-[#3D4152] hover:text-[#FF0038]'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              <span>Sign in</span>
+            </Link>
+          )}
+
+          {/* Cart Button */}
+          {role !== 'admin' && (
+            <button
+              onClick={() => setCartOpen(true)}
+              className="flex items-center gap-3 bg-[#F2F4F8] hover:bg-[#E8EBF1] text-[#282C3F] h-[52px] px-6 rounded-xl font-bold transition active:scale-95 group"
+            >
+              <div className="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#282C3F] group-hover:scale-105 transition-transform"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#FF0038] text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden sm:inline">My Cart</span>
+              {cartCount > 0 && <span className="text-sm font-normal text-gray-500 ml-1">{fmtINR(cartTotal)}</span>}
+            </button>
           )}
         </div>
       </div>
-      
+
       {/* Cart Sidebar */}
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </header>

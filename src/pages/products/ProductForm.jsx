@@ -11,14 +11,23 @@ const schema = yup.object({
   category: yup.string().required(),
   price: yup.number().min(0).required(),
   stock: yup.number().min(0).required(),
-  unitType: yup.string().oneOf(['kg','pcs']).optional(),
+  unitType: yup.string().oneOf(['kg', 'pcs']).optional(),
   image: yup.string().url().nullable().optional()
 })
 
 export default function ProductForm() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm({ resolver: yupResolver(schema) })
+  const { register, handleSubmit, reset, setValue, getValues, formState: { errors, isSubmitting } } = useForm({ resolver: yupResolver(schema) })
+
+  const handleNameBlur = (e) => {
+    const name = e.target.value
+    const currentImg = getValues('image')
+    if (name && !currentImg) {
+      const url = `https://image.pollinations.ai/prompt/fresh ${encodeURIComponent(name)} fruit vegetable grocery?nologo=true`
+      setValue('image', url)
+    }
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -66,7 +75,7 @@ export default function ProductForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block mb-1">Name</label>
-          <input className="w-full border rounded px-3 py-2 bg-transparent" {...register('name')} />
+          <input className="w-full border rounded px-3 py-2 bg-transparent" {...register('name', { onBlur: handleNameBlur })} />
           {errors.name && <p className="text-sm text-brand-brown">{errors.name.message}</p>}
         </div>
         <div>
